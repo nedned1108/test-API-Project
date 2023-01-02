@@ -132,42 +132,6 @@ router.get(
                 ],
                 query
             });
-
-        // Easy loading  
-        // for (let spot of spots) {
-        //     const avgRating = await Review.findAll({
-        //         where: {
-        //             spotId: spot.id
-        //         },
-        //         attributes: {
-        //             include: [
-        //                 [
-        //                     sequelize.fn('AVG', sequelize.col('stars')), 'avgRating'
-        //                 ]
-        //             ]
-        //         },
-        //         group: 'id',
-        //         raw: true
-        //     });
-            // const previewImage = await SpotImage.findAll({
-            //     where: {
-            //         spotId: spot.id
-            //     },
-            //     attributes: ['url'],
-            // })
-            // if (avgRating[0]) {
-            //     spot.avgRating = avgRating[0].avgRating;
-            // } else {
-            //     spot.avgRating = 0;
-            // }
-            
-            // if (previewImage[0]) {
-            //     spot.previewImage = previewImage[0].url;
-            // } else {
-            //     spot.previewImage = null;
-            // }
-        // };
-
         return res.json({ spots, page, size });
     })
 
