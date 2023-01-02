@@ -113,39 +113,60 @@ router.get(
             query.offset = size * (page - 1);
         };
 
-        const spots = await Spot.findAll({raw: true, ...query});
-        for (let spot of spots) {
-            const avgRating = await Review.findAll({
-                where: {
-                    spotId: spot.id
-                },
+        const spots = await Spot.findAll({
                 attributes: {
                     include: [
-                        [
-                            sequelize.fn('AVG', sequelize.col('stars')), 'avgRating'
-                        ]
-                ]},
-                group: 'id',
-                raw: true
-            });
-            const previewImage = await SpotImage.findAll({
-                where: {
-                    spotId: spot.id
+                        [ sequelize.fn('AVG', sequelize.col("Reviews.stars")), 'avgRating'],
+                        [ sequelize.fn('MAX', sequelize.col("SpotImages.url")), 'previewImage']
+                    ],
                 },
-                attributes: ['url'],
-            })
-            if (avgRating[0]) {
-                spot.avgRating = avgRating[0].avgRating;
-            } else {
-                spot.avgRating = 0;
-            }
+                include: [
+                    {
+                        model: Review,
+                        attributes: []
+                    },
+                    {
+                        model: SpotImage, 
+                        attributes: []
+                    },
+                ],
+                query
+            });
+
+        // Easy loading  
+        // for (let spot of spots) {
+        //     const avgRating = await Review.findAll({
+        //         where: {
+        //             spotId: spot.id
+        //         },
+        //         attributes: {
+        //             include: [
+        //                 [
+        //                     sequelize.fn('AVG', sequelize.col('stars')), 'avgRating'
+        //                 ]
+        //             ]
+        //         },
+        //         group: 'id',
+        //         raw: true
+        //     });
+            // const previewImage = await SpotImage.findAll({
+            //     where: {
+            //         spotId: spot.id
+            //     },
+            //     attributes: ['url'],
+            // })
+            // if (avgRating[0]) {
+            //     spot.avgRating = avgRating[0].avgRating;
+            // } else {
+            //     spot.avgRating = 0;
+            // }
             
-            if (previewImage[0]) {
-                spot.previewImage = previewImage[0].url;
-            } else {
-                spot.previewImage = null;
-            }
-        };
+            // if (previewImage[0]) {
+            //     spot.previewImage = previewImage[0].url;
+            // } else {
+            //     spot.previewImage = null;
+            // }
+        // };
 
         return res.json({ spots, page, size });
     })
